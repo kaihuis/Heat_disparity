@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Program Name: 2_cmip6_ensemble_final_KS.R
+# Program Name: 2_cmip6_ensemble_main_data.R
 # Date Last Modified: Jan, 2025
 # Program Purpose: Ensemble model from CMIP6 
 # Input Files: CMIP6 tas and hurs
@@ -79,12 +79,12 @@ us_counties %>% ggplot(aes(x = long, y = lat, group = group))+geom_polygon()
 # county shp data
 
 county1 <- st_read("/Users/songkaihui/Documents/CMIP6/data/cb_2018_us_county_20m/cb_2018_us_county_20m.shp") %>%
-  filter(STATEFP %!in% c("02", "15","60","66","69", "72","77"))
+  filter(STATEFP %!in% c("02", "15","60","66","69", "72","77")) #contiguous US
 
 # 2. CMIP6 ensemble (tas, hurs, HI calculation) -----
 
 climate.scenarios <- c("ssp119", "ssp126", "ssp245", "ssp370", "ssp585")
-ssp_index = "ssp585"
+
 var = c("tas", "hurs")
 
 for(ssp_index in climate.scenarios)
@@ -110,13 +110,14 @@ for(ssp_index in climate.scenarios)
             "IPSL-CM6A-LR", "MIROC-ES2L", "MIROC6", "MPI-ESM1-2-HR", "MPI-ESM1-2-LR", "MPI-ESM-1-2-HAM",
             "MRI-ESM2-0", "NorESM2-LM", "NorESM2-MM", "TaiESM1", "UKESM1-0-LL", "UKESM1-1-LL")
   
-    year <- c(2015, 2016, 2017, 2018, 2019, 2020, 
+    year <- c(2016, 2017, 2018, 2019, 2020, 
               2030, 2040, 
-              2045, 2046, 2047, 2048, 2049, 2050, 
+              2046, 2047, 2048, 2049, 2050, 
               2060, 2070, 2080, 2090, 
-              2095, 2096, 2097, 2098, 2099, 2100)
+              2096, 2097, 2098, 2099, 2100)
 
     variant_fix <- c("r1i1p1f1")
+  
     idx <- init_cmip6_index(
         activity = "ScenarioMIP", # only consider ScenarioMIP activity
         variable = var,   # specify dry-bulb temperature and relative humidity
@@ -211,11 +212,11 @@ for(ssp_index in climate.scenarios)
                "IPSL-CM6A-LR", "MIROC-ES2L", "MIROC6", "MPI-ESM1-2-HR", "MPI-ESM1-2-LR", "MPI-ESM-1-2-HAM",
                "MRI-ESM2-0", "NorESM2-LM", "NorESM2-MM", "TaiESM1", "UKESM1-0-LL", "UKESM1-1-LL")
     
-    year <- c(2015, 2016, 2017, 2018, 2019, 2020, 
+    year <- c(2016, 2017, 2018, 2019, 2020, 
               2030, 2040, 
-              2045, 2046, 2047, 2048, 2049, 2050, 
+              2046, 2047, 2048, 2049, 2050, 
               2060, 2070, 2080, 2090, 
-              2095, 2096, 2097, 2098, 2099, 2100)
+              2096, 2097, 2098, 2099, 2100)
     
     variant_fix <- c("r1i1p1f1")
     idx <- init_cmip6_index(
@@ -278,10 +279,10 @@ for(ssp_index in climate.scenarios)
                            SSP = ssp_index) %>% 
                   as_tibble() %>%
                   separate(date, into = c('Year',"Mon","Day"), sep = "-") %>%
-                  filter(Year %in% c(seq(2015, 2020, by = 1), 2030, 2040, 
-                               seq(2045, 2050, by = 1), 
+                  filter(Year %in% c(seq(2016, 2020, by = 1), 2030, 2040, 
+                               seq(2046, 2050, by = 1), 
                                2060, 2070, 2080, 2090,
-                               seq(2095, 2100, by = 1))) 
+                               seq(2096, 2100, by = 1))) 
                 time.series.hurs = rbind(time.series.hurs, points_data)
              }
          }
@@ -324,7 +325,7 @@ for(ssp_index in climate.scenarios)
         }
     
     name = paste0("ensemble_HI_", ssp_index, ".csv")
-    write.csv(p.data.final,"ensemble_HI_ssp585_v3.csv", row.names = FALSE)
+    #write.csv(p.data.final,"ensemble_HI_ssp585_v3.csv", row.names = FALSE) #v3 for main data
 }
 
 # 3. Data merge -----
