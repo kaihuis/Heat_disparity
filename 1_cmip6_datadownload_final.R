@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Program Name: 1_cmip6_datadownload_final_May2025.R
+# Program Name: 1_cmip6_datadownload.R
 # Date Last Modified: May, 2025
 # Program Purpose: Download CMIP6 data
 # Author: Kaihui Song
