@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Program Name: 3_merge_socioecon_final_KS.R
+# Program Name: 3_merge_socioecon.R
 # Date Last Modified: Jan, 2023
 # Program Purpose: Merging assembled Earth System Model data with projected 
 #                  socioeconomic data
@@ -358,8 +358,17 @@ gdp_data %>%
   filter(SSP == "ssp126") -> gdp2
 gdp_data2 = rbind(gdp1, gdp2) 
 
+# 2. compile socioeconomic data -----
+socioecon <- pop_data2 %>%
+  left_join(gender_data2, by = c("Year", "GEOID", "SSP")) %>%
+  left_join(white_data2, by = c("Year", "GEOID", "SSP")) %>%
+  left_join(black_data2, by = c("Year", "GEOID", "SSP")) %>%
+  left_join(hispanic_data2, by = c("Year", "GEOID", "SSP")) %>%
+  left_join(other_data2, by = c("Year", "GEOID", "SSP")) %>%
+  left_join(age_data3, by = c("Year", "GEOID", "SSP")) %>%
+  left_join(gdp_data2, by = c("Year", "GEOID", "SSP")) 
 
-# 2. merge -----
+# 3. merge -----
 
 merge.new <- iam.HI.byperiod %>%
   ungroup() %>%
@@ -367,14 +376,7 @@ merge.new <- iam.HI.byperiod %>%
   mutate(Year = replace(Year, Time.label == "Base", 2020),
          Year = replace(Year, Time.label == "Mid", 2050),
          Year = replace(Year, Time.label == "End", 2100)) %>%
-  left_join(gdp_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(pop_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(gender_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(white_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(black_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(hispanic_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(other_data2, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(age_data3, by = c("Year", "GEOID", "SSP"))
+  left_join(socioecon, by = c("Year", "GEOID", "SSP")) 
 
 write.csv(merge.new,"merged_data_HI_v3.csv", row.names = FALSE)
 
