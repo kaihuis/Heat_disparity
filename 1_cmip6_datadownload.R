@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Program Name: 1_cmip6_datadownload.R
-# Date Last Modified: May, 2025
+# Date Last Modified: June, 2025
 # Program Purpose: Download CMIP6 data
 # Author: Kaihui Song
 # Contact: kaihuis@berkeley.edu
@@ -43,7 +43,6 @@ rm(list=ls())
 split_path <- function(path) {
   rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
 } 
-
 # directory is set in the loop
 
 
@@ -70,13 +69,13 @@ for(ssp_index in climate.senarios)
                "IPSL-CM6A-LR", "MIROC-ES2L", "MIROC6", "MPI-ESM1-2-HR", "MPI-ESM1-2-LR", "MPI-ESM-1-2-HAM",
                "MRI-ESM2-0", "NorESM2-LM", "NorESM2-MM", "TaiESM1", "UKESM1-0-LL", "UKESM1-1-LL")
   
-    year <- c(2016, 2017, 2018, 2019, 2020, # to calculate 2020 average for analysis
-              2046, 2047, 2048, 2049, 2050, # to calculate 2050 average for analysis
-              2096, 2097, 2098, 2099, 2100, # to calculate 2100 average for analysis
-              2030, 2040, 2060, 2070, 2080, 2090) # other decadal years
+    year <- c(2015, 2016, 2017, 2018, 2019, 2020, # to calculate 2020 average for analysis
+              2045, 2046, 2047, 2048, 2049, 2050, # to calculate 2050 average for analysis
+              2095, 2096, 2097, 2098, 2099, 2100, # to calculate 2100 average for analysis
+              2030, 2040, 2060, 2070, 2080, 2090). # other decadal years
 
     variant_fix <- c("r1i1p1f1")
-  
+    
     idx <- init_cmip6_index(
         activity = "ScenarioMIP", # only consider ScenarioMIP activity
         variable = c("tas"),   # specify dry-bulb temperature and relative humidity
@@ -145,13 +144,12 @@ for(ssp_index in climate.senarios)
              "IPSL-CM6A-LR", "MIROC-ES2L", "MIROC6", "MPI-ESM1-2-HR", "MPI-ESM1-2-LR", "MPI-ESM-1-2-HAM",
              "MRI-ESM2-0", "NorESM2-LM", "NorESM2-MM", "TaiESM1", "UKESM1-0-LL", "UKESM1-1-LL")
   
-  year <- c(2016, 2017, 2018, 2019, 2020, # to calculate 2020 average for analysis
-              2046, 2047, 2048, 2049, 2050, # to calculate 2050 average for analysis
-              2096, 2097, 2098, 2099, 2100, # to calculate 2100 average for analysis
-              2030, 2040, 2060, 2070, 2080, 2090) # other decadal years
+  year <- c(2015, 2016, 2017, 2018, 2019, 2020, # to calculate 2020 average for analysis
+            2045, 2046, 2047, 2048, 2049, 2050, # to calculate 2050 average for analysis
+            2095, 2096, 2097, 2098, 2099, 2100, # to calculate 2100 average for analysis
+            2030, 2040, 2060, 2070, 2080, 2090). # other decadal years
   
   variant_fix <- c("r1i1p1f1")
-  
   idx <- init_cmip6_index(
     activity = "ScenarioMIP", # only consider ScenarioMIP activity
     variable = c("hurs"),   # specify dry-bulb temperature and relative humidity

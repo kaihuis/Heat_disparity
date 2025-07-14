@@ -1,8 +1,6 @@
 # Program Name: 4_disparity_analysis_final_section3_KS.R
-# Date Last Modified: Jan, 2025
+# Date Last Modified: June, 2025
 # Program Purpose: Disparity in heat exposure. Figure 6. 
-# Input Files:  CMIP6: merged.new2.csv
-#               county-level geometry data 
 # Author: Kaihui Song
 # Contact: kaihuis@berkeley.edu
 # Affiliation: Energy and Resources Group, University of California, Berkeley

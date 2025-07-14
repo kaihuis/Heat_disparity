@@ -1,11 +1,7 @@
 # Program Name: 4_disparity_analysis_final_section1_KS.R
-# Date Last Modified: Jan, 2025
+# Date Last Modified: June, 2025
 # Program Purpose: Disparity in heat exposure,
 #                  producing Figures 1&2, Figures S2-S4, Tables S4-S6
-# Input Files:  CMIP6: merged.new2.csv
-#               county-level geometry data 
-#               monthly HI data: iam_HI_data.csv
-# Output Files: 
 # Author: Kaihui Song
 # Contact: kaihuis@berkeley.edu
 # Affiliation: Energy and Resources Group, University of California, Berkeley
@@ -138,9 +134,6 @@ merge %>%
          increase_rate_mid_base_hurs = increase_mid_base_hurs_total/8) %>%
   mutate(increase_mid_base_tas_c = increase_mid_base_tas_total *5/9,
          increase_mid_base_HI_c = increase_mid_base_HI_total *5/9) -> changes
-
-#changes %>% filter(SSP == "SSP2-RCP4.5") -> SI_stat1.1
-#changes %>% filter(SSP == "SSP5-RCP8.5") -> SI_stat1.2
 
 changes_cty <- left_join(county_boundary, changes, by = "GEOID") 
 
@@ -353,8 +346,6 @@ HI_tas_cty %>%
   facet_grid(SSP~Time.label) +
   scale_fill_gradient2(name =  "Difference between Heat Index and near-surface air temperature",
                        breaks = seq(-5,20, by = 5),
-                      # labels = seq(50,125, by = 25),
-                      # limits = c(0,0),
                        low= "#018571", mid = "cornsilk", high="#a6611a",
                        midpoint = 0) +
   theme(strip.background = element_blank()) +
@@ -422,7 +413,7 @@ figS4 %>%
   theme(strip.text.x = element_text(size = 11),
         strip.text.y = element_text(size = 11),
         axis.text=element_text(size=12),
-        axis.title.x=element_text(size=13), #,face="bold"),
+        axis.title.x=element_text(size=13), 
         axis.title.y=element_text(size=13), 
         strip.background = element_rect(fill = rgb(0, 0, 0, 0.2)),
         legend.position="bottom",

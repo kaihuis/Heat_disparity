@@ -1,14 +1,11 @@
 # ------------------------------------------------------------------------------
 # Program Name: 3_merge_socioecon.R
-# Date Last Modified: Jan, 2023
+# Date Last Modified: June, 2023
 # Program Purpose: Merging assembled Earth System Model data with projected 
 #                  socioeconomic data
-# Input Files: iam_HI_data_v3.csv
-#              other downloaded socioeconomic data:
-#               1) Total population: county_pop_ssp.csv
-#               2) Gender: county_fpop_ssp.csv
-#               3) Age: county_age_pop_ssp.csv
-# Output Files: merge2.csv 
+# Input Files: HI_data_main_result.csv
+#              Socioeconomic data (population/gender/age/race/gdp)
+# Output Files: merged.csv 
 # Author: Kaihui Song
 # Contact: kaihuis@berkeley.edu
 # Affiliation: University of California, Berkeley
@@ -25,7 +22,7 @@ rm(list=ls())
   library(openxlsx)
   library(ncdf4)
   library(raster)
-  library(rgdal)
+  #library(rgdal)
   library(sp)
   library("epwshiftr")
   library(eplusr)
@@ -58,30 +55,12 @@ split_path <- function(path) {
 
 # 1. Read data -----
 
-## 1.1 Heat data ----
-heat_ssp <- read_csv("~/Documents/CMIP6/data/iam_HI_data_v3.csv")
-heat_ssp %>% 
-  filter(Year %in% c(2015:2020, 2045:2050, 2095:2100)) %>%
-  filter(Mon %in% c("06","07","08")) %>%
-  mutate(Time.label = "Base") %>%
-  mutate(Time.label = replace(Time.label, Year %in% c(2045:2050), "Mid"),
-         Time.label = replace(Time.label, Year %in% c(2095:2100), "End")) %>%
-  group_by(Time.label, SSP, GEOID, STATE_NAME, NAME, lat,lon) %>%
-  summarise(mean.tas.summer = mean(mean.tas),
-            median.tas.summer = mean(median.tas),
-            mean.hurs.summer = mean(mean.hurs),
-            median.hurs.summer = mean(median.hurs),
-            mean.HI.summer = mean(mean.hurs),
-            median.HI.summer = mean(median.HI)) ->iam.HI.byperiod
 
-#write.csv(iam.HI.byperiod,"iam.HI.byperiod.csv", row.names = FALSE)
-
-
-dir <- '/Users/songkaihui/Documents/CMIP6/data/socioecon/SEDAC_popdynamics-us-county-xlsx/SEDAC_georeferenced_county_population_proj'
+dir <- 'data/socioecon/SEDAC_popdynamics-us-county-xlsx/SEDAC_georeferenced_county_population_proj'
 setwd( dir )
 
 
-## 1.2 Pop data -----
+## 1.1 Pop data -----
 
 pop_data <- read_excel("hauer_county_totpop_SSPs.xlsx")
 pop_data %>%
@@ -107,7 +86,7 @@ pop %>%
 pop_data2 = rbind(pop1, pop2) %>% mutate(Year = as.numeric(Year))
 
 
-## 1.3 Gender data ----
+## 1.2 Gender data ----
 
 gender_data <- read_excel("hauer_county_female_pop_SSPs.xlsx")
 gender_data %>%
@@ -132,9 +111,9 @@ gender %>%
   filter(SSP == "ssp126") -> gender2
 gender_data2 = rbind(gender1, gender2) %>% mutate(Year = as.numeric(Year))
 
-## 1.4 Age data ----
+## 1.3 Age data ----
 
-county <- st_read("/Users/songkaihui/Documents/CMIP6/data/cb_2018_us_county_20m/cb_2018_us_county_20m.shp") %>%
+county <- st_read("data/cb_2018_us_county_20m/cb_2018_us_county_20m.shp") %>%
   filter(STATEFP %!in% c("02", "15","60","66","69", "72","77")) 
 county %>%
   rename(GEOID10 = "GEOID") -> county
@@ -176,7 +155,7 @@ age_data3 <- as.data.frame(age_data2) %>%
   mutate(Year= as.numeric(Year))
 
 
-## 1.5 Race/enthinicty data ----
+## 1.4 Race/enthinicty data ----
 
 ### white ----
 white_data <- read_excel("hauer_county_whiteNH_pop_SSPs.xlsx")
@@ -275,16 +254,16 @@ others %>%
   filter(SSP == "ssp126") -> others2
 other_data2 = rbind(others1, others2) %>% mutate(Year = as.numeric(Year))
 
-## 1.6 gdp ----
+## 1.5 gdp ----
 
 # read raster
 for(ssp in c("SSP1", "SSP2", "SSP3", "SSP5"))
 {
   ssp = "SSP1"
-  path = paste0("/Users/songkaihui/Documents/CMIP6/data/socioecon/GDP(SSP1-5)_grid/result(GDP)_",ssp)
+  path = paste0("data/socioecon/GDP(SSP1-5)_grid/result(GDP)_",ssp)
   setwd(path)
   print(ssp)
-  county <- st_read("/Users/songkaihui/Documents/CMIP6/data/cb_2018_us_county_20m/cb_2018_us_county_20m.shp") %>%
+  county <- st_read("data/cb_2018_us_county_20m/cb_2018_us_county_20m.shp") %>%
     filter(STATEFP %!in% c("02", "15","60","66","69", "72","77")) 
   
   for(year in c(seq(2020, 2100, by = 10)))
@@ -332,7 +311,7 @@ for(ssp in c("SSP1", "SSP2", "SSP3", "SSP5"))
   #write.csv(county_ssp,"county_GDP_ssp1.csv", row.names = TRUE)
 }
 
-setwd("/Users/songkaihui/Documents/CMIP6/data/socioecon/GDP(SSP1-5)_grid/GDP")
+setwd("data/socioecon/GDP(SSP1-5)_grid/GDP")
 
 gdp_data <- data.frame()
 
@@ -358,7 +337,7 @@ gdp_data %>%
   filter(SSP == "ssp126") -> gdp2
 gdp_data2 = rbind(gdp1, gdp2) 
 
-# 2. compile socioeconomic data -----
+# compile socioeconomic data -----
 socioecon <- pop_data2 %>%
   left_join(gender_data2, by = c("Year", "GEOID", "SSP")) %>%
   left_join(white_data2, by = c("Year", "GEOID", "SSP")) %>%
@@ -366,17 +345,21 @@ socioecon <- pop_data2 %>%
   left_join(hispanic_data2, by = c("Year", "GEOID", "SSP")) %>%
   left_join(other_data2, by = c("Year", "GEOID", "SSP")) %>%
   left_join(age_data3, by = c("Year", "GEOID", "SSP")) %>%
-  left_join(gdp_data2, by = c("Year", "GEOID", "SSP")) 
+  left_join(gdp_data2, by = c("Year", "GEOID", "SSP")) %>%
+  mutate(SSP = case_when(SSP == "ssp119" ~ "SSP1-RCP1.9",
+                         SSP == "ssp126" ~ "SSP1-RCP2.6",
+                         SSP == "ssp245" ~ "SSP2-RCP4.5",
+                         SSP == "ssp370" ~ "SSP3-RCP7.0",
+                         SSP == "ssp585" ~ "SSP5-RCP8.5"))
+#write.csv(socioecon,"socioecon.csv", row.names = FALSE)
+
+# 2. Heat data ----
+HI_data_main_result <- read_csv("HI_data_main_result.csv") 
 
 # 3. merge -----
 
-merge.new <- iam.HI.byperiod %>%
-  ungroup() %>%
-  mutate(Year = 2020) %>%
-  mutate(Year = replace(Year, Time.label == "Base", 2020),
-         Year = replace(Year, Time.label == "Mid", 2050),
-         Year = replace(Year, Time.label == "End", 2100)) %>%
+merged <- HI_data_main_result %>%
   left_join(socioecon, by = c("Year", "GEOID", "SSP")) 
 
-write.csv(merge.new,"merged_data_HI_v3.csv", row.names = FALSE)
+#write.csv(merged,"data/merged.csv", row.names = FALSE)
 
